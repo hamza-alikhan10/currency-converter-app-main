@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter Pro - Fast and Accurate Conversions</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z" />
+            </svg>
+            CurrencyConverter Pro
+        </div>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h1>Currency Converter</h1>
+            <form id="converterForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="quantity">Amount</label>
+                        <input type="number" id="quantity" name="quantity" min="0.01" step="0.01" value="1" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="currency">Base Currency</label>
+                        <select name="currency" id="currency" class="form-control">
+                            <option value="USD">US Dollar (USD)</option>
+                            <option value="EUR">Euro (EUR)</option>
+                            <option value="GBP">British Pound (GBP)</option>
+                            <option value="JPY">Japanese Yen (JPY)</option>
+                            <option value="AUD">Australian Dollar (AUD)</option>
+                            <option value="CAD">Canadian Dollar (CAD)</option>
+                            <option value="CHF">Swiss Franc (CHF)</option>
+                            <option value="CNY">Chinese Yuan (CNY)</option>
+                            <option value="INR">Indian Rupee (INR)</option>
+                            <option value="MXN">Mexican Peso (MXN)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn" type="submit" id="convertBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <polyline points="19 12 12 19 5 12"></polyline>
+                        </svg>
+                        Convert
+                    </button>
+                    <button class="btn" type="button" id="swapBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 16V4M7 4L3 8M7 4L11 8"></path>
+                            <path d="M17 8v12m0 0l4-4m-4 4l-4-4"></path>
+                        </svg>
+                        Swap Currencies
+                    </button>
+                </div>
+
+                <div class="quick-convert">
+                    <h3>Quick Convert:</h3>
+                    <div id="quickCurrencies">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </form>
+
+            <div class="loader" id="loader">
+                <div class="loader-spinner"></div>
+                <p>Fetching latest rates...</p>
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                Unable to fetch currency rates. Please try again later.
+            </div>
+
+            <div class="output" id="outputSection">
+                <h2>Conversion Results</h2>
+                <input type="text" id="searchCurrency" class="search-box" placeholder="Search currencies...">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Favorite</th>
+                            <th>Currency</th>
+                            <th>Code</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTable">
+                        <!-- Results will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Currency Converter Pro &copy; 2025 - All rights reserved</p>
+        <p>Exchange rates provided by <a href="https://currencyapi.com" target="_blank">Currency API</a></p>
+    </footer>
+
+    <!-- Script must be at the end of body -->
+    <script >// Wait for DOM to be fully loaded before executing code
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM fully loaded");
+            
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            
+            // Check if user has previously set a theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                console.log("Theme toggle clicked");
+                body.classList.toggle('dark-mode');
+                
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('theme', 'dark');
+                    themeToggle.textContent = '☀️';
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    themeToggle.textContent = '🌙';
+                }
+            });
+            
+            // Currency converter functionality
+            const API_KEY = "cur_live_3G1ky7g9pgdAsbhyktOlcgJzqaO7Em7eH0zjsxXF";
+            const API_BASE = "https://api.currencyapi.com/v3/latest";
+            
+            // DOM Elements
+            const converterForm = document.getElementById('converterForm');
+            const quantityInput = document.getElementById('quantity');
+            const currencySelect = document.getElementById('currency');
+            const convertBtn = document.getElementById('convertBtn');
+            const swapBtn = document.getElementById('swapBtn');
+            const searchInput = document.getElementById('searchCurrency');
+            const resultsTable = document.getElementById('resultsTable');
+            const outputSection = document.getElementById('outputSection');
+            const loader = document.getElementById('loader');
+            const errorMessage = document.getElementById('errorMessage');
+            const quickCurrencies = document.getElementById('quickCurrencies');
+            
+            // State variables
+            let currentResults = [];
+            let favoriteCurrencies = JSON.parse(localStorage.getItem('favoritesCurrencies') || '["USD", "EUR", "GBP", "JPY", "INR"]');
+            let targetCurrency = 'EUR'; // Default target currency for swap feature
+            
+            // Initialize quick convert currencies
+            function initQuickCurrencies() {
+                const popularCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'INR'];
+                quickCurrencies.innerHTML = '';
+                
+                popularCurrencies.forEach(currency => {
+                    const badge = document.createElement('div');
+                    badge.className = 'currency-badge';
+                    badge.textContent = currency;
+                    badge.addEventListener('click', () => {
+                        console.log("Quick currency clicked:", currency);
+                        currencySelect.value = currency;
+                        fetchCurrencyData(parseFloat(quantityInput.value) || 1, currency);
+                    });
+                    quickCurrencies.appendChild(badge);
+                });
+            }
+            
+            // Load saved preferences
+            function loadSavedPreferences() {
+                const lastBaseCurrency = localStorage.getItem('lastBaseCurrency');
+                const lastAmount = localStorage.getItem('lastAmount');
+                
+                if (lastBaseCurrency && currencySelect.querySelector(`option[value="${lastBaseCurrency}"]`)) {
+                    currencySelect.value = lastBaseCurrency;
+                }
+                
+                if (lastAmount) {
+                    quantityInput.value = lastAmount;
+                }
+            }
+            
+       // Format currency function
+function formatCurrency(value, currencyCode) {
+    // List of standard currency codes that Intl.NumberFormat supports
+    const standardCurrencyCodes = ["USD", "EUR", "GBP", "JPY", "CAD", "AUD", "CHF", "CNY", "INR", "MXN", "BRL", "RUB"];
+    
+    // Check if it's a standard currency code
+    if (standardCurrencyCodes.includes(currencyCode)) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: currencyCode,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value);
+    } else {
+        // For non-standard codes (like crypto), use a generic format with the code appended
+        return new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value) + " " + currencyCode;
+    }
+}
+            
+            // Fetch and display currency data
+            async function fetchCurrencyData(amount, baseCurrency) {
+                console.log("Fetching data:", amount, baseCurrency);
+                
+                // Validate inputs
+                if (!amount || isNaN(amount) || amount <= 0) {
+                    alert('Please enter a valid amount greater than 0');
+                    return;
+                }
+                
+                // Save preferences
+                localStorage.setItem('lastBaseCurrency', baseCurrency);
+                localStorage.setItem('lastAmount', amount);
+                
+                // Show loader, hide error
+                loader.style.display = 'block';
+                errorMessage.style.display = 'none';
+                outputSection.style.display = 'none';
+                
+                try {
+                    const url = `${API_BASE}?apikey=${API_KEY}&base_currency=${baseCurrency}`;
+                    console.log("API URL (without sensitive API key):", API_BASE + "?apikey=[HIDDEN]&base_currency=" + baseCurrency);
+                    
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('API Error:', errorData);
+                        throw new Error(`API Error: ${response.status} - ${errorData.message || 'Unknown error'}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log("API Response:", data);
+                    
+                    currentResults = [];
+                    
+                    // Process and display results
+                    for (let key in data.data) {
+                        const currencyData = data.data[key];
+                        const convertedValue = currencyData.value * amount;
+                        
+                        currentResults.push({
+                            name: key,
+                            code: key, // Using key as code since the API structure may vary
+                            value: convertedValue,
+                            isFavorite: favoriteCurrencies.includes(key)
+                        });
+                    }
+                    
+                    displayResults();
+                    outputSection.style.display = 'block';
+                }
+                catch (error) {
+                    console.error('Error fetching currency data:', error);
+                    errorMessage.textContent = `Unable to fetch currency rates: ${error.message}`;
+                    errorMessage.style.display = 'block';
+                }
+                finally {
+                    loader.style.display = 'none';
+                }
+            }
+            
+            // Display results in table
+            function displayResults(filterText = '') {
+                let filteredResults = currentResults;
+                
+                // Apply filter if provided
+                if (filterText) {
+                    filterText = filterText.toLowerCase();
+                    filteredResults = currentResults.filter(currency => 
+                        currency.name.toLowerCase().includes(filterText) ||
+                        currency.code.toLowerCase().includes(filterText)
+                    );
+                }
+                
+                // Sort results: favorites first, then alphabetically
+                filteredResults = filteredResults.sort((a, b) => {
+                    if (a.isFavorite && !b.isFavorite) return -1;
+                    if (!a.isFavorite && b.isFavorite) return 1;
+                    return a.code.localeCompare(b.code);
+                });
+                
+                // Generate HTML
+                let tableHTML = '';
+                filteredResults.forEach(currency => {
+                    const starClass = currency.isFavorite ? 'active' : '';
+                    
+                    tableHTML += `
+                        <tr>
+                            <td>
+                                <span class="star-icon ${starClass}" data-currency="${currency.code}">
+                                    ${currency.isFavorite ? '★' : '☆'}
+                                </span>
+                            </td>
+                            <td>${currency.name}</td>
+                            <td>${currency.code}</td>
+                            <td>${formatCurrency(currency.value, currency.code)}</td>
+                        </tr>
+                    `;
+                });
+                
+                resultsTable.innerHTML = tableHTML;
+                
+                // Add event listeners to star icons
+                document.querySelectorAll('.star-icon').forEach(star => {
+                    star.addEventListener('click', (e) => {
+                        const currencyCode = e.target.dataset.currency;
+                        toggleFavorite(currencyCode);
+                    });
+                });
+            }
+            
+            // Toggle favorite currency
+            function toggleFavorite(currencyCode) {
+                const index = favoriteCurrencies.indexOf(currencyCode);
+                
+                if (index === -1) {
+                    favoriteCurrencies.push(currencyCode);
+                } else {
+                    favoriteCurrencies.splice(index, 1);
+                }
+                
+                // Update UI
+                currentResults.forEach(currency => {
+                    if (currency.code === currencyCode) {
+                        currency.isFavorite = !currency.isFavorite;
+                    }
+                });
+                
+                displayResults(searchInput.value);
+                
+                // Save to local storage
+                localStorage.setItem('favoritesCurrencies', JSON.stringify(favoriteCurrencies));
+            }
+            
+            // Swap functionality
+            function swapCurrencies() {
+                console.log("Swap button clicked");
+                const currentBase = currencySelect.value;
+                
+                // Find first non-base favorite or use EUR
+                if (currentResults.length > 0) {
+                    const nonBaseFavorite = currentResults.find(c => c.code !== currentBase && c.isFavorite);
+                    if (nonBaseFavorite) {
+                        targetCurrency = nonBaseFavorite.code;
+                    }
+                }
+                
+                // Swap the currencies
+                currencySelect.value = targetCurrency;
+                targetCurrency = currentBase;
+                
+                // Trigger conversion
+                fetchCurrencyData(parseFloat(quantityInput.value) || 1, currencySelect.value);
+            }
+            
+            // Event Listeners - Simplified to avoid conflicts
+            converterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                console.log("Form submitted");
+                const amount = parseFloat(quantityInput.value);
+                const currency = currencySelect.value;
+                fetchCurrencyData(amount, currency);
+            });
+            
+            // We don't need a separate event for the convert button since it's part of the form
+            
+            swapBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                swapCurrencies();
+            });
+            
+            searchInput.addEventListener('input', (e) => {
+                displayResults(e.target.value);
+            });
+            
+            // Initialize the app
+            initQuickCurrencies();
+            loadSavedPreferences();
+            
+            // Auto-convert with initial values - delay to ensure everything's loaded
+            setTimeout(() => {
+                const amount = parseFloat(quantityInput.value) || 1;
+                const currency = currencySelect.value;
+                fetchCurrencyData(amount, currency);
+            }, 500);
+        }); </script>
+</body>
+
+</html>
